@@ -6,8 +6,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,12 +35,6 @@ public class MyCrawler {
         String link = patchNoteElement.parent().parent().selectFirst("a").attr("href");
         String title = patchNoteElement.select("span.line_clamp").first().text();
 
-        LocalDate rawToday = LocalDate.now();
-        String today = rawToday.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-        String yesterday = rawToday.minusDays(1).format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-
-        if (today.equals(date) || yesterday.equals(date)) {
-            curPatchNotes.add(new PatchNote(date, link, title));
-        }
+        curPatchNotes.add(new PatchNote(date, link, title));
     }
 }
