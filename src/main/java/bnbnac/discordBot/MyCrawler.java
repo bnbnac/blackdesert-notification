@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MyCrawler {
+public class MyCrawler implements Crawler {
+    @Override
     public Set<PatchNote> crawl() {
         Set<PatchNote> curPatchNotes = new HashSet<>();
         boolean state;
