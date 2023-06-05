@@ -2,6 +2,7 @@ package bnbnac.discordBot;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class SecretReader {
@@ -13,7 +14,8 @@ public class SecretReader {
 
         Properties properties = new Properties();
 
-        try (FileInputStream input = new FileInputStream("src/main/resources/secret")) {
+        try (InputStream input = SecretReader.class.getClassLoader().getResourceAsStream("secret");
+        ) {
             properties.load(input);
             value = properties.getProperty(property);
         } catch (IOException e) {

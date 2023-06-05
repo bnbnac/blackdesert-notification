@@ -26,7 +26,7 @@ public class Controller {
             System.out.println("channel not found");
             return;
         }
-        channel.sendMessage("## " + "channel found!");
+
         if (news.isEmpty()) {
             return;
         }
