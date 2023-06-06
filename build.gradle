@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 group 'org.example'
@@ -10,9 +9,20 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    resolvedImplementation.extendsFrom(implementation).canBeResolved = true
+}
+
 jar {
+    duplicatesStrategy = 'warn'
+
     manifest {
         attributes 'Main-Class': 'bnbnac.discordBot.Main'
+    }
+    from {
+        configurations.resolvedImplementation.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
 
