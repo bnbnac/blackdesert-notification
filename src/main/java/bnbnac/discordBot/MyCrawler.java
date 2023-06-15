@@ -9,33 +9,42 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static bnbnac.discordBot.PatchNotesUtils.parseElementToPatchNote;
+
 public class MyCrawler implements Crawler {
-    @Override
-    public Set<PatchNote> crawl() {
-        Set<PatchNote> curPatchNotes = new HashSet<>();
-        boolean state;
+    private boolean connected;
+    private PatchNotesStorage patchNotesStorage;
 
-        try {
-            String url = "https://www.kr.playblackdesert.com/ko-kr/News/Notice?boardType=2";
-            Document doc = Jsoup.connect(url).get();
-            Elements patchNoteElements = doc.select("strong.title");
-
-            for (Element patchNoteElement : patchNoteElements) {
-                buildCurPatchNotes(patchNoteElement, curPatchNotes);
-            }
-        } catch (IOException e) {
-            // 디코방에 announce. 리패치 성공하면 다시 announce. 실패하면 pass. state
-            e.printStackTrace();
-        }
-
-        return curPatchNotes;
+    public MyCrawler(PatchNotesStorage patchNotesStorage) {
+        this.patchNotesStorage = patchNotesStorage;
+        connected = true;
     }
 
-    public void buildCurPatchNotes(Element patchNoteElement, Set<PatchNote> curPatchNotes) {
-        String date = patchNoteElement.select("span.date").first().text();
-        String link = patchNoteElement.parent().parent().selectFirst("a").attr("href");
-        String title = patchNoteElement.select("span.line_clamp").first().text();
+    @Override
+    public boolean crawl() {
+        String url = "https://www.kr.playblackdesert.com/ko-kr/News/Notice?boardType=2";
+        boolean needToSendFailMessage = false;
 
-        curPatchNotes.add(new PatchNote(date, link, title));
+        try {
+            Document doc = Jsoup.connect(url).get();
+            connected = true;
+
+            Elements patchNoteElements = doc.select("strong.title");
+
+            Set<PatchNote> curPatchNotes = new HashSet<>();
+            for (Element patchNoteElement : patchNoteElements) {
+                curPatchNotes.add(parseElementToPatchNote(patchNoteElement));
+            }
+
+            patchNotesStorage.pushPatchNotes(curPatchNotes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (connected) {
+                needToSendFailMessage = true;
+            }
+            connected = false;
+        }
+
+        return needToSendFailMessage;
     }
 }
