@@ -1,43 +1,49 @@
-import bnbnac.discordBot.Controller;
-import bnbnac.discordBot.Crawler;
 import bnbnac.discordBot.PatchNote;
+import bnbnac.discordBot.PatchNotesStorage;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ComparatorTest {
-    class FakeCrawler implements Crawler {
-        int i = 0;
-        List<Set<PatchNote>> list = new ArrayList<>();
+    static Set<PatchNote> prev;
+    static Set<PatchNote> cur;
+    PatchNotesStorage patchNotesStorage;
 
-        public FakeCrawler() {
-            Set<PatchNote> prev = new HashSet<>();
-            prev.add(new PatchNote("1", "1", "1"));
-            prev.add(new PatchNote("2", "2", "2"));
-            prev.add(new PatchNote("3", "3", "3"));
-            list.add(prev);
+    @BeforeAll
+    public static void fake() {
+        prev = new HashSet<>();
+        prev.add(new PatchNote("1", "1", "1"));
+        prev.add(new PatchNote("2", "2", "2"));
+        prev.add(new PatchNote("3", "3", "3"));
 
-            Set<PatchNote> cur = new HashSet<>();
-            cur.add(new PatchNote("1", "1", "1"));
-            cur.add(new PatchNote("2", "2", "2"));
-            cur.add(new PatchNote("3", "3", "3"));
-            cur.add(new PatchNote("new", "new", "new"));
-            list.add(cur);
-        }
+        cur = new HashSet<>(prev);
+        cur.add(new PatchNote("new", "new", "new"));
+    }
 
-        public Set<PatchNote> crawl() {
-            return list.get(i++);
-        }
+    @BeforeEach
+    void init() {
+        patchNotesStorage = new PatchNotesStorage();
     }
 
     @Test
-    void getNewPatchNotesTest() throws InterruptedException {
-        Controller controller = new Controller();
-        controller.crawler = new FakeCrawler();
-        controller.run();
-        controller.run();
+    void pushFirstPatchThenNewsIsEmpty() {
+        patchNotesStorage.pushPatchNotes(prev);
+        List<String> news = patchNotesStorage.getNews();
+
+        Assertions.assertTrue(news.isEmpty());
+    }
+
+    @Test
+    void pushDifferentPatchAndGetNews() {
+        patchNotesStorage.pushPatchNotes(prev);
+        patchNotesStorage.pushPatchNotes(cur);
+        List<String> news = patchNotesStorage.getNews();
+
+        Assertions.assertEquals(news.get(0), "new");
     }
 }
