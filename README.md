@@ -12,6 +12,7 @@ by commit line.
 As a novice programmer, welcome any advice.
 
 ---
-#### need refactoring
+#### TODO
 
-- PatchNotesStorage
+- refactor PatchNotesStorage
+- logging
