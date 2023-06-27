@@ -27,7 +27,7 @@ public class Controller {
 
         boolean needToSendFailMessage = crawler.crawl();
         if (needToSendFailMessage) {
-            channel.sendMessage("홈페이지 연결에 실패했습니다.");
+            channel.sendMessage("홈페이지에 다시 연결되었습니다.");
             return;
         }
 
@@ -35,10 +35,10 @@ public class Controller {
         if (news.isEmpty()) {
             return;
         }
-        List<String> messages = parseNews(news, patchNotesStorage.getStoredPatchNotes());
+        List<String> messages = parseNews(news, patchNotesStorage.getCurPatchNotes());
 
         for (String message : messages) {
-            channel.sendMessage(message);
+            channel.sendMessage(message).queue();
         }
     }
 
