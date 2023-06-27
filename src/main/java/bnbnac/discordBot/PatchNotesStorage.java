@@ -7,20 +7,22 @@ import java.util.Set;
 
 import static bnbnac.discordBot.PatchNotesUtils.getNewPatchNotes;
 
-// not very good of maintaining prevPatch
 public class PatchNotesStorage {
     private Set<PatchNote> prevPatchNotes;
-    private Set<PatchNote> storedPatchNotes;
+    private Set<PatchNote> curPatchNotes;
 
     public PatchNotesStorage() {
         prevPatchNotes = new HashSet<>();
-        storedPatchNotes = new HashSet<>();
+        curPatchNotes = new HashSet<>();
     }
 
     // need memory control?
     public void pushPatchNotes(Set<PatchNote> curPatchNotes) {
-        prevPatchNotes = this.storedPatchNotes;
-        this.storedPatchNotes = curPatchNotes;
+        if (curPatchNotes.isEmpty()) {
+            return;
+        }
+        prevPatchNotes = this.curPatchNotes;
+        this.curPatchNotes = curPatchNotes;
     }
 
     public List<String> getNews() {
@@ -29,7 +31,7 @@ public class PatchNotesStorage {
             return new ArrayList<>();
         }
 
-        return getNewPatchNotes(convertToTitleSet(prevPatchNotes), convertToTitleSet(storedPatchNotes));
+        return getNewPatchNotes(convertToTitleSet(prevPatchNotes), convertToTitleSet(curPatchNotes));
     }
 
     public Set<String> convertToTitleSet(Set<PatchNote> patchNotes) {
@@ -42,7 +44,7 @@ public class PatchNotesStorage {
         return titleSet;
     }
 
-    public Set<PatchNote> getStoredPatchNotes() {
-        return storedPatchNotes;
+    public Set<PatchNote> getCurPatchNotes() {
+        return curPatchNotes;
     }
 }
