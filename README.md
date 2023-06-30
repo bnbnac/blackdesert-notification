@@ -1,5 +1,5 @@
 ### written in java 17
-### dependent on [JSD](https://github.com/DV8FromTheWorld/JDA)
+### dependent on [JDA](https://github.com/DV8FromTheWorld/JDA)
 
 ---
 
